@@ -10,7 +10,7 @@ import io.javalin.rendering.template.JavalinJte;
 import java.sql.SQLException;
 
 public class App {
-
+//
     private static TemplateEngine createTemplateEngine() {
         ClassLoader classLoader = App.class.getClassLoader();
         ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates", classLoader);

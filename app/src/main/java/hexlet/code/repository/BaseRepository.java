@@ -17,6 +17,10 @@ public class BaseRepository {
         config.setJdbcUrl(jdbcUrl);
         config.setMaximumPoolSize(10);
 
+        if (jdbcUrl.contains("postgresql")) {
+            config.setDriverClassName("org.postgresql.Driver");
+        }
+
         dataSource = new HikariDataSource(config);
     }
 

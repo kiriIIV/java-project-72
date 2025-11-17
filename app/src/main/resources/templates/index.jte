@@ -11,6 +11,17 @@
         <div class="row">
             <div class="col-md-8 mx-auto">
                 <h1 class="text-center mb-4">Page Analyzer</h1>
+
+                <!-- Flash сообщения -->
+                @if(flash != null)
+                    @if(flash.error != null)
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            ${flash.error}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+                @endif
+
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Welcome to Page Analyzer</h5>
@@ -19,7 +30,7 @@
                             Enter a URL to get started with SEO analysis.
                         </p>
                         <form action="/urls" method="post" class="d-flex">
-                            <input type="text" name="url" class="form-control me-2" placeholder="Enter URL" required>
+                            <input type="url" name="url" class="form-control me-2" placeholder="https://example.com" required>
                             <button type="submit" class="btn btn-primary">Analyze</button>
                         </form>
                     </div>

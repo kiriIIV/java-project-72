@@ -3,7 +3,7 @@ WORKDIR /app
 COPY . .
 RUN gradle shadowJar
 
-FROM openjdk:21-jdk-slim
+FROM openjdk:21-jre-slim  # ИСПРАВЛЕНО: используем jre вместо jdk
 WORKDIR /app
 COPY --from=build /app/build/libs/app-1.0-SNAPSHOT-all.jar app.jar
 EXPOSE 7070

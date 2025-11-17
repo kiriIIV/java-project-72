@@ -1,8 +1,8 @@
-FROM gradle:7.4.0-jdk17
+FROM gradle:8.7-jdk21-alpine
 
 WORKDIR /app
 
-COPY /app .
+COPY . .
 
 RUN gradle installDist
 

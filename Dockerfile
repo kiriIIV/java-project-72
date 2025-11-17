@@ -1,6 +1,9 @@
-FROM eclipse-temurin:21-jdk-alpine
+FROM gradle:7.4.0-jdk17
+
 WORKDIR /app
-COPY . .
-RUN ./gradlew shadowJar
-EXPOSE 7070
-CMD ["java", "-jar", "build/libs/app-1.0-SNAPSHOT-all.jar"]
+
+COPY /app .
+
+RUN gradle installDist
+
+CMD ./build/install/app/bin/app

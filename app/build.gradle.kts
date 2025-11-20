@@ -67,7 +67,8 @@ tasks.jacocoTestReport { reports { xml.required.set(true) } }
 
 sonar {
   properties {
-    property("sonar.projectKey", "java-project-72")
+    property("sonar.projectKey", "kiriIIV_java-project-72")
     property("sonar.organization", "ogeeon")
   }
 }
+

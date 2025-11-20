@@ -1,0 +1,14 @@
+.gradle
+.idea
+
+build
+
+app/.gradle
+app/.idea
+app/gradlew.bat
+app/build
+app/jte-classes
+app/.vscode
+app/.sonarlint/connectedMode.json
+app/.github
+app/bin

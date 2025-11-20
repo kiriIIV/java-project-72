@@ -1,44 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Analyzer</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-8 mx-auto">
-                <h1 class="text-center mb-4">Page Analyzer</h1>
+@import hexlet.code.util.NamedRoutes
+@import hexlet.code.dto.BasePage
+@import hexlet.code.util.FlashType
+@param BasePage page = null
+@param String flash = null
+@param FlashType flashType = null
 
-                <!-- Flash сообщения -->
-                @if(flash != null)
-                    @if(flash.error != null)
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            ${flash.error}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+@template.layout.page(
+    content = @`
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title text-center mb-4">Введите URL сайта</h3>
+                            <form action="${NamedRoutes.urlsPath()}" method="POST">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="urlInput" name="url" placeholder="Ссылка" required>
+                                    <button type="submit" class="btn btn-primary">Добавить</button>
+                                </div>
+                                <div class="form-text">
+                                    Например: https://example.com
+                                </div>
+                            </form>
                         </div>
-                    @endif
-                @endif
-
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Welcome to Page Analyzer</h5>
-                        <p class="card-text">
-                            This is a simple web application for analyzing web pages.
-                            Enter a URL to get started with SEO analysis.
-                        </p>
-                        <form action="/urls" method="post" class="d-flex">
-                            <input type="url" name="url" class="form-control me-2" placeholder="https://example.com" required>
-                            <button type="submit" class="btn btn-primary">Analyze</button>
-                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    `,
+    page = page,
+    activeNav = NamedRoutes.rootPath(),
+    flash = flash,
+    flashType = flashType
+)

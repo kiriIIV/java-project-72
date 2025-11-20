@@ -1,7 +1,13 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 plugins {
-    id("java")
-    id("application")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    application
+    jacoco
+    checkstyle
+    alias(libs.plugins.benManes)
+    alias(libs.plugins.sonarqube)
+    alias(libs.plugins.shadow)
 }
 
 group = "hexlet.code"
@@ -11,20 +17,57 @@ application {
     mainClass.set("hexlet.code.App")
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-}
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation("io.javalin:javalin:6.1.6")
-    implementation("org.slf4j:slf4j-simple:2.0.13")
-    implementation("com.zaxxer:HikariCP:5.1.0")
-    implementation("com.h2database:h2:2.2.224")
-    implementation("org.postgresql:postgresql:42.7.2")
-    implementation("gg.jte:jte:3.1.9")
-    implementation("io.javalin:javalin-rendering:6.1.6")
+    implementation(libs.postgresql)
+    implementation(libs.h2)
+    implementation(libs.hikari)
+    implementation(libs.slf4jSimple)
+    implementation(libs.jte)
+    implementation(libs.javalin)
+    implementation(libs.javalinBundle)
+    implementation(libs.javalinRendering)
+    implementation(libs.unirest)
+    implementation(libs.jsoup)
+
+    testImplementation(libs.assertjCore)
+    testImplementation(platform(libs.junitBom))
+    testImplementation(libs.junitJupiter)
+    testImplementation(libs.mockWebserver)
+    testImplementation(libs.okhttp)
+    
+    testRuntimeOnly(libs.junitPlatformLauncher)
+    testRuntimeOnly(libs.junitJupiterEngine)
+
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
+
+    testCompileOnly(libs.lombok)
+    testAnnotationProcessor(libs.lombok)
+}
+
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        exceptionFormat = TestExceptionFormat.FULL
+        events = setOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
+        showStandardStreams = true
+    }
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+}
+
+tasks.jacocoTestReport { reports { xml.required.set(true) } }
+
+sonar {
+  properties {
+    property("sonar.projectKey", "Ogeeon_java-project-72")
+    property("sonar.organization", "ogeeon")
+  }
 }

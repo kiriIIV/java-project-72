@@ -1,69 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${url.name} - Page Analyzer</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-8 mx-auto">
-                <nav aria-label="breadcrumb" class="mb-4">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item"><a href="/urls">URLs</a></li>
-                        <li class="breadcrumb-item active">${url.name}</li>
-                    </ol>
-                </nav>
+@import hexlet.code.dto.UrlPage
+@import hexlet.code.util.NamedRoutes
+@import hexlet.code.util.FlashType
+@import java.time.format.DateTimeFormatter
 
-                <h1 class="text-center mb-4">URL Details</h1>
+@param UrlPage page
+@param String flash = null
+@param FlashType flashType = null
 
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Website Information</h5>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-borderless">
-                            <tr>
-                                <th class="w-25">ID:</th>
-                                <td>${url.id}</td>
-                            </tr>
-                            <tr>
-                                <th>URL:</th>
-                                <td>
-                                    <a href="${url.name}" target="_blank" class="text-decoration-none">
-                                        ${url.name}
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Created At:</th>
-                                <td>${url.createdAt}</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
+@template.layout.page(
+    content = @`
+        <div class="container mt-4">
+            <h2>Сайт: ${page.getUrl().getName()}</h2>
+            <table class="table">
+                <tbody>
+                    <tr><td>ID</td><td>${page.getUrl().getId()}</td></tr>
+                    <tr><td>Имя</td><td>${page.getUrl().getName()}</td></tr>
+                    <tr><td>Дата создания</td><td>${page.getUrl().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))}</td></tr>
+                </tbody>
+            </table>
+            <h2 class="mt-5">Проверки</h2>
+            <form method="post" action="${NamedRoutes.checkPath(page.getUrl().getId())}">
+                <button type="submit" class="btn btn-primary">Запустить проверку</button>
+            </form>
 
-                <!-- Место для будущих проверок SEO -->
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">SEO Analysis</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted">SEO analysis will be available in the next steps.</p>
-                    </div>
-                </div>
-
-                <div class="text-center mt-4">
-                    <a href="/urls" class="btn btn-secondary me-2">← Back to URLs</a>
-                    <a href="/" class="btn btn-primary">Add New URL</a>
-                </div>
-            </div>
+            <table class="table table-bordered table-hover mt-3">
+                <tr>
+                    <th class="col-1">ID</th><th class="col-1">Код ответа</th><th>title</th><th>h1</th><th>description</th><th class="col-2">Дата проверки</th>
+                </tr>
+                <tbody>
+                @if (page.getChecks() != null)
+                    @for(var check: page.getChecks())
+                        <tr>
+                            <td>${check.getId()}</td>
+                            <td>${check.getStatusCode()}</td>
+                            <td>${check.getTitle()}</td>
+                            <td>${check.getH1()}</td>
+                            <td>${check.getDescription()}</td>
+                            <td>${check.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))}</td>
+                        </tr>
+                    @endfor
+                @endif
+                </tbody>
+            </table>
         </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    `,
+    page = page,
+    activeNav = null,
+    flash = flash,
+    flashType = flashType
+)

@@ -1,81 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URLs - Page Analyzer</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-10 mx-auto">
-                <h1 class="text-center mb-4">Websites</h1>
+@import hexlet.code.dto.UrlsPage
+@import hexlet.code.util.NamedRoutes
+@import hexlet.code.util.FlashType
+@import java.time.format.DateTimeFormatter
 
-                <!-- Flash сообщения -->
-                @if(flash != null)
-                    @if(flash.success != null)
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            ${flash.success}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-                    @if(flash.info != null)
-                        <div class="alert alert-info alert-dismissible fade show" role="alert">
-                            ${flash.info}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-                    @if(flash.error != null)
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            ${flash.error}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-                @endif
+@param UrlsPage page
+@param String flash = null
+@param FlashType flashType = null
 
-                <table class="table table-striped table-bordered">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>URL</th>
-                            <th>Created At</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if(urls.isEmpty())
-                            <tr>
-                                <td colspan="4" class="text-center text-muted py-4">
-                                    No URLs added yet. <a href="/">Add your first URL</a>
-                                </td>
-                            </tr>
-                        @else
-                            @for(url in urls)
-                                <tr>
-                                    <td>${url.id}</td>
-                                    <td>
-                                        <a href="${url.name}" target="_blank" class="text-decoration-none">
-                                            ${url.name}
-                                        </a>
-                                    </td>
-                                    <td>${url.createdAt}</td>
-                                    <td>
-                                        <a href="/urls/${url.id}" class="btn btn-outline-primary btn-sm">View</a>
-                                    </td>
-                                </tr>
-                            @endfor
-                        @endif
-                    </tbody>
-                </table>
+@template.layout.page(
+    content = @`
+        <div class="container mt-4">
+            <h2>Сайты</h2>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Имя</th>
+                        <th>Последняя проверка</th>
+                        <th>Код ответа</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @for(var url: page.getUrls())
+                <tr>
+                    <td>${url.getId()}</td>
+                    <td><a href="${NamedRoutes.urlPath(url.getId())}">${url.getName()}</a></td>
+                    !{ var lastCheck = page.getChecks().get(url.getId()); }
+                    <td>${lastCheck == null ? "" : lastCheck.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))}</td>
+                    <td>${lastCheck == null ? "" : String.valueOf(lastCheck.getStatusCode())}</td>
 
-                <div class="text-center mt-4">
-                    <a href="/" class="btn btn-primary">Add New URL</a>
-                </div>
-            </div>
+                </tr>
+                @endfor
+                </tbody>
+            </table>
         </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    `,
+    page = page,
+    activeNav = NamedRoutes.urlsPath(),
+    flash = flash,
+    flashType = flashType
+)

@@ -1,23 +1,16 @@
-FROM eclipse-temurin:21-jdk
+FROM gradle:8.12.1-jdk21
+
+RUN groupadd -r nonroot && useradd -r -g nonroot nonroot
 
 WORKDIR /app
+RUN chown -R nonroot:nonroot /app
 
 COPY gradle gradle
 COPY build.gradle.kts .
-COPY settings.gradle.kts .
-COPY gradlew .
-
-RUN chmod +x gradlew
-
-RUN ./gradlew dependencies --no-daemon
-
-COPY src src
 COPY config config
-
-RUN ./gradlew clean build --no-daemon
-
 EXPOSE 7070
 
-RUN ./gradlew installDist --no-daemon
+RUN ./gradlew installDist
 
-CMD ./build/install/app/bin/app
+USER nonroot
+CMD ["./build/install/app/bin/app"]

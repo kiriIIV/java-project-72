@@ -7,12 +7,17 @@ COPY build.gradle.kts .
 COPY settings.gradle.kts .
 COPY gradlew .
 
-RUN ./gradlew dependencies
+RUN chmod +x gradlew
+
+RUN ./gradlew dependencies --no-daemon
 
 COPY src src
 COPY config config
 
+RUN ./gradlew clean build --no-daemon
+
 EXPOSE 7070
 
-RUN ./gradlew installDist
+RUN ./gradlew installDist --no-daemon
+
 CMD ./build/install/app/bin/app

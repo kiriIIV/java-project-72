@@ -32,17 +32,7 @@ public class App {
     }
 
     private static String getJdbcUrl() {
-        String dbUrl = System.getenv().getOrDefault("JDBC_DATABASE_URL",
-                System.getenv().getOrDefault("DATABASE_URL",
-                        "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;"));
-
-        if (dbUrl.startsWith("postgresql://")) {
-            dbUrl = "jdbc:" + dbUrl;
-            log.info("Converted Render URL to JDBC format");
-        }
-
-        log.info("Using database URL: {}", dbUrl.replaceAll(":[^:]*@", ":****@"));
-        return dbUrl;
+        return System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
     }
 
     private static String readResourceFile(String fileName) throws IOException {
@@ -65,14 +55,6 @@ public class App {
     }
 
     public static void main(String[] args) throws IOException, SQLException {
-        try {
-            Class.forName("org.postgresql.Driver");
-            log.info("PostgreSQL driver loaded successfully");
-        } catch (ClassNotFoundException e) {
-            log.error("PostgreSQL driver not found. Make sure it's in dependencies.");
-            throw new RuntimeException("PostgreSQL Driver not found", e);
-        }
-
         var app = getApp();
         var port = getPort();
         log.info("Starting application with listening on port {}", port);
@@ -82,11 +64,10 @@ public class App {
     public static Javalin getApp() throws IOException, SQLException {
         var hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getJdbcUrl());
-        hikariConfig.setDriverClassName("org.postgresql.Driver"); // Явно указываем драйвер
         hikariConfig.setMaximumPoolSize(10);
 
         var dataSource = new HikariDataSource(hikariConfig);
-
+        // There won't be this env variable locally. It can be set to "true" on Render if needed.
         if (System.getenv().getOrDefault("RECREATE_SCHEMA", "true").equalsIgnoreCase("true")) {
             var sql = readResourceFile("schema.sql");
             if (!sql.isEmpty()) {

@@ -7,7 +7,13 @@ RUN chown -R nonroot:nonroot /app
 
 COPY gradle gradle
 COPY build.gradle.kts .
+COPY settings.gradle.kts .
+COPY gradlew .
+COPY src src
 COPY config config
+
+RUN chmod +x gradlew
+
 EXPOSE 7070
 
 RUN ./gradlew installDist

@@ -15,7 +15,7 @@
 
 Приложение развернуто на облачной платформе Render и доступно по ссылке:
 
-### [Открыть SEO Validator] (https://java-project-72-vitp.onrender.com)
+### [Открыть приложение](https://java-project-72-vitp.onrender.com)
 
 ---
 

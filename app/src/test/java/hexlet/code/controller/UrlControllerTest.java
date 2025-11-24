@@ -286,4 +286,23 @@ class UrlControllerTest {
         });
         server.close();
     }
+
+    @Test
+    void testCheckWithUnreachableUrl() {
+        JavalinTest.test(app, (server, client) -> {
+            var url = new Url("https://unreachable-test-domain-12345.com");
+            UrlRepository.save(url);
+
+            try (var response = client.post(NamedRoutes.checkPath(url.getId()))) {
+                assertThat(response.code()).isEqualTo(200);
+                var body = response.body();
+                assertThat(body).isNotNull();
+                var bodyString = body.string();
+                assertThat(bodyString).contains(url.getName());
+            }
+
+            var checks = UrlCheckRepository.getEntitiesByUrlId(url.getId());
+            assertThat(checks).isEmpty();
+        });
+    }
 }

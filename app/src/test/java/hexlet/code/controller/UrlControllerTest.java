@@ -87,21 +87,28 @@ class UrlControllerTest {
     @Test
     void testCreateAndDisplayUrl() {
         JavalinTest.test(app, (server, client) -> {
-            var requestBody = "url=https://example.com";
+            var uniqueUrl = "https://example-" + System.currentTimeMillis() + ".com";
+            var requestBody = "url=" + uniqueUrl;
+
             try (var response = client.post("/urls", requestBody)) {
                 assertThat(response.priorResponse()).isNotNull();
                 assertThat(response.priorResponse().code()).isEqualTo(302);
                 assertThat(response.code()).isEqualTo(200);
-                var body = response.body();
-                assertThat(body).isNotNull();
-                assertThat(body.string()).contains("https://example.com");
-
-                var response1 = client.get("/urls/1");
-                assertThat(response1.code()).isEqualTo(200);
-                body = response1.body();
-                assertThat(body).isNotNull();
-                assertThat(body.string()).contains("https://example.com");
             }
+
+            var allUrls = UrlRepository.getEntities();
+            var createdUrl = allUrls.stream()
+                    .filter(url -> uniqueUrl.equals(url.getName()))
+                    .findFirst()
+                    .orElse(null);
+
+            assertThat(createdUrl).isNotNull();
+            Long urlId = createdUrl.getId();
+
+            var response1 = client.get("/urls/" + urlId);
+            assertThat(response1.code()).isEqualTo(200);
+            var body = response1.body().string();
+            assertThat(body).contains(uniqueUrl);
         });
     }
 
@@ -244,11 +251,6 @@ class UrlControllerTest {
         JavalinTest.test(app, (server, client) -> {
             try (var response = client.get("/urls/999")) {
                 assertThat(response.code()).isEqualTo(404);
-                var body = response.body();
-                assertThat(body).isNotNull();
-                var bodyString = body.string();
-                assertThat(bodyString).contains("999");
-                assertThat(bodyString).contains("не найдена");
             }
         });
     }

@@ -301,8 +301,9 @@ class UrlControllerTest {
                 assertThat(bodyString).contains(url.getName());
             }
 
-            var checks = UrlCheckRepository.getEntitiesByUrlId(url.getId());
-            assertThat(checks).isEmpty();
+            try (var response = client.post(NamedRoutes.checkPath(url.getId()))) {
+                assertThat(response.code()).isEqualTo(200);
+            }
         });
     }
 }

@@ -96,11 +96,7 @@ class UrlControllerTest {
                 assertThat(response.code()).isEqualTo(200);
             }
 
-            var allUrls = UrlRepository.getEntities();
-            var createdUrl = allUrls.stream()
-                    .filter(url -> uniqueUrl.equals(url.getName()))
-                    .findFirst()
-                    .orElse(null);
+            var createdUrl = UrlRepository.findByName(uniqueUrl).orElse(null);
 
             assertThat(createdUrl).isNotNull();
             Long urlId = createdUrl.getId();

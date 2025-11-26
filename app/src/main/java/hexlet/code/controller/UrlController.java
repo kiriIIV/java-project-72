@@ -36,14 +36,8 @@ public final class UrlController {
         throw new UnsupportedOperationException("Utility class");
     }
 
-    private static String getUrlFromString(String input) throws IllegalArgumentException {
-        URL urlObj;
-        try {
-            urlObj = (new URI(input.trim().toLowerCase())).toURL();
-        } catch (NullPointerException | MalformedURLException | URISyntaxException | IllegalArgumentException e) {
-            log.info("Incorrect url passed: {}", input);
-            throw new IllegalArgumentException("Некорректный URL");
-        }
+    private static String getUrlFromString(String input) throws MalformedURLException, URISyntaxException {
+        URL urlObj = (new URI(input.trim().toLowerCase())).toURL();
         return String.format(
                 "%s://%s%s",
                 urlObj.getProtocol(),
@@ -52,32 +46,35 @@ public final class UrlController {
     }
 
     public static void create(Context ctx) throws SQLException {
-        var urlParam  = ctx.formParam("url");
+        var urlParam = ctx.formParam("url");
 
+        String name;
         try {
-            String name = getUrlFromString(urlParam);
-
-            if (UrlRepository.nameExists(name)) {
-                var page = new MainPage();
-                ctx.render(MAIN_PAGE_JTE, model(
-                        "page", page,
-                        ATTR_FLASH, "Страница уже существует",
-                        ATTR_FLASH_TYPE, FlashType.ERROR)
-                );
-            } else {
-                var urlObj = new Url(name);
-                UrlRepository.save(urlObj);
-                ctx.sessionAttribute(ATTR_FLASH, "Страница успешно добавлена");
-                ctx.sessionAttribute(ATTR_FLASH_TYPE, FlashType.SUCCESS);
-                ctx.redirect(NamedRoutes.urlsPath());
-            }
-        } catch (IllegalArgumentException e) {
+            name = getUrlFromString(urlParam);
+        } catch (Exception e) {
             var page = new MainPage();
             ctx.render(MAIN_PAGE_JTE, model(
                     "page", page,
-                    ATTR_FLASH, e.getMessage(),
+                    ATTR_FLASH, "Некорректный URL",
                     ATTR_FLASH_TYPE, FlashType.ERROR)
             );
+            return;
+        }
+
+        var existingUrl = UrlRepository.findByName(name);
+        if (existingUrl.isPresent()) {
+            var page = new MainPage();
+            ctx.render(MAIN_PAGE_JTE, model(
+                    "page", page,
+                    ATTR_FLASH, "Страница уже существует",
+                    ATTR_FLASH_TYPE, FlashType.ERROR)
+            );
+        } else {
+            var urlObj = new Url(name);
+            UrlRepository.save(urlObj);
+            ctx.sessionAttribute(ATTR_FLASH, "Страница успешно добавлена");
+            ctx.sessionAttribute(ATTR_FLASH_TYPE, FlashType.SUCCESS);
+            ctx.redirect(NamedRoutes.urlsPath());
         }
     }
 

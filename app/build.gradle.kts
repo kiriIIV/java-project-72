@@ -23,7 +23,6 @@ repositories {
 
 dependencies {
     implementation(libs.postgresql)
-    implementation("org.postgresql:postgresql:42.7.1")
     implementation(libs.h2)
     implementation(libs.hikari)
     implementation(libs.slf4jSimple)
